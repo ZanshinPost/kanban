@@ -1,0 +1,71 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  background-color: #222;
+  padding: 1em;
+  color: #d4f5de;
+  flex: 0 1 50px;
+}
+
+.board {
+  flex: 1 1 0px;
+  background: #d4f5de;
+  padding: 1em;
+  display: flex;
+  align-items: flex-start;
+}
+
+.list {
+  padding: 10px;
+  width: 200px;
+  box-shadow: 3px 3px 10px #444;
+  margin-right: 20px;
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.list > * {
+  margin: 8px 0;
+}
+
+.list > input {
+  background: #f1f1f1;
+  outline: none;
+  width: 100%;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.list > input:focus {
+  background: #fff;
+}
+
+.list > h3 {
+  text-align: center;
+}
+
+.list .item {
+  padding: 5px;
+  background: #fff;  
+}
+
+.item span {
+  float: right;
+  cursor: pointer;
+}
