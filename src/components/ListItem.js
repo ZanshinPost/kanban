@@ -14,7 +14,11 @@ const listItemSource = {
 
 const itemDropTarget = {
     hover(props, monitor) {
-        console.log(monitor.getItem());
+
+        props.itemHoverListener({
+            'target': [props.listId, props.index, props.item],
+            'source': [monitor.getItem().listId, monitor.getItem().index, monitor.getItem().item]
+        });
     }
 };
 

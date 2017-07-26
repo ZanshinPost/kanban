@@ -14,16 +14,51 @@ class Board extends Component {
         this.addItemListener = this.addItemListener.bind(this);
         this.addListListener = this.addListListener.bind(this);
         this.removeItemListener = this.removeItemListener.bind(this);
+        this.removeListListener = this.removeListListener.bind(this);
+        this.itemHoverListener = this.itemHoverListener.bind(this);
+        this.updateListAfterDrop = this.updateListAfterDrop.bind(this);
     }
 
-    componentWillUpdate() {
+    componentDidUpdate() {
         localStorage.setItem('lists', JSON.stringify(this.state));
     }
 
-    addItemListener(key, item) {
+    updateListAfterDrop(listId, itemIndex, item) {
+        let source = this.state.currentOperation.source;
+        let target = this.state.currentOperation.target;
+        // let stateObj = this.state;
+
+        if (!source && !target) {
+            this.addItemListener(listId, item);
+            return;
+        }
+
+        this.removeItemListener(source[0], itemIndex);
+        if (!target && source[1] === itemIndex && source[2] === item) {
+            this.addItemListener(listId, item);
+            return;
+        }
+        let targetIndex = target[1];
+        this.addItemListener(listId, item, targetIndex);
+    }
+
+    itemHoverListener({ source, target }) {
+        console.log(`Hover on ${target} by ${source}`);
+        this.setState(prevState => {
+            prevState.currentOperation = prevState.currentOperation || {};
+            prevState.currentOperation.source = source;
+            prevState.currentOperation.target = target;
+        });
+    }
+
+    addItemListener(key, item, targetIndex) {
         this.setState((prevState) => {
             let list = prevState.lists.filter(list => list.key === key)[0];
-            list && list.items.push(item);
+            if (typeof targetIndex !== 'undefined') {
+                list.items.splice(targetIndex, 0, item);
+            } else {
+                list.items.push(item);
+            }
 
             return prevState;
         });
@@ -44,16 +79,25 @@ class Board extends Component {
         });
     }
 
+    removeListListener(listId) {
+        this.setState(prevState => ({
+            lists: prevState.lists.filter(list => list.key !== listId)
+        }));
+    }
+
     render() {
         const Lists = this.state.lists.map(list => (
             <List key={list.key}
                 id={list.key}
                 title={list.title}
                 items={list.items}
+                updateList={this.updateListAfterDrop}
                 addItemListener={this.addItemListener}
-                removeItemListener={this.removeItemListener} />
+                removeItemListener={this.removeItemListener}
+                removeListListener={this.removeListListener}
+                itemHoverListener={this.itemHoverListener} />
         ));
-        Lists.push(<List key={Lists.length} addListListener={this.addListListener} />);
+        Lists.push(<List key={-1} addListListener={this.addListListener} />);
 
         return (
             <div className="board">
