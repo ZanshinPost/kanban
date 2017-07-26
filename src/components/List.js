@@ -26,7 +26,7 @@ class List extends Component {
     }
 
     onKeyPressListener(e) {
-        if (e.charCode === 13) {
+        if (e.charCode === 13 && e.target.value.trim().length > 0) {
             if (this.props.title)
                 this.props.addItemListener(this.props.id, e.target.value);
             else
