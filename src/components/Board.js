@@ -26,7 +26,6 @@ class Board extends Component {
     updateListAfterDrop(listId, itemIndex, item) {
         let source = this.state.currentOperation.source;
         let target = this.state.currentOperation.target;
-        // let stateObj = this.state;
 
         if (!source && !target) {
             this.addItemListener(listId, item);
@@ -43,7 +42,6 @@ class Board extends Component {
     }
 
     itemHoverListener({ source, target }) {
-        console.log(`Hover on ${target} by ${source}`);
         this.setState(prevState => {
             prevState.currentOperation = prevState.currentOperation || {};
             prevState.currentOperation.source = source;
