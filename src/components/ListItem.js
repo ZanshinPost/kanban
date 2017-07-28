@@ -12,15 +12,22 @@ const listItemSource = {
     }
 };
 
-const itemDropTarget = {
-    hover(props, monitor) {
+const itemDropTarget = (function () {
+    let hoverCalled = false;
+    return {
+        hover(props, monitor) {
+            if (!hoverCalled) {
+                props.itemHoverListener({
+                    'target': [props.listId, props.index, props.item],
+                    'source': [monitor.getItem().listId, monitor.getItem().index, monitor.getItem().item]
+                });
+                hoverCalled = true;
+                setTimeout(() => (hoverCalled = false), 250);
+            }
+        }
+    };
 
-        props.itemHoverListener({
-            'target': [props.listId, props.index, props.item],
-            'source': [monitor.getItem().listId, monitor.getItem().index, monitor.getItem().item]
-        });
-    }
-};
+})();
 
 function dragCollect(connect, monitor) {
     return {

@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import ListItem from './ListItem.js';
+import DummyItem from './DummyItem.js';
 import { ItemTypes } from '../constants.js';
 import { DropTarget } from 'react-dnd';
 
 const itemTarget = {
-    drop(props, monitor) {
+    drop(props, monitor, component) {
         let itemObj = monitor.getItem();
         props.updateList(props.id, itemObj.index, itemObj.item);
+        component.setState({
+            onHoverPos: undefined
+        });
     }
 };
 
 function collect(connect, monitor) {
     return {
         connectDropTarget: connect.dropTarget(),
-        isOver: monitor.isOver()
+        isOver: monitor.isOver({ shallow: true })
     };
 }
 
@@ -23,6 +27,9 @@ class List extends Component {
         this.onKeyPressListener = this.onKeyPressListener.bind(this);
         this.removeItemListener = this.removeItemListener.bind(this);
         this.removeListListener = this.removeListListener.bind(this);
+        this.itemHoverListener = this.itemHoverListener.bind(this);
+
+        this.state = {};
     }
 
     onKeyPressListener(e) {
@@ -43,8 +50,15 @@ class List extends Component {
         this.props.removeListListener(this.props.id);
     }
 
+    itemHoverListener({ source, target }) {
+        this.setState({
+            onHoverPos: target[1]
+        });
+        this.props.itemHoverListener({ source, target });
+    }
+
     render() {
-        const { connectDropTarget } = this.props;
+        const { connectDropTarget, isOver } = this.props;
         if (this.props.title) {
             const items = this.props.items.map((item, i) => (
                 <ListItem key={i}
@@ -52,8 +66,17 @@ class List extends Component {
                     listId={this.props.id}
                     item={item}
                     removeItemListener={this.removeItemListener}
-                    itemHoverListener={this.props.itemHoverListener} />
+                    itemHoverListener={this.itemHoverListener} />
             ));
+            const dummy = <DummyItem key="-1" />
+
+            if (this.state.onHoverPos !== undefined) {
+                items.splice(this.state.onHoverPos, 0, dummy);
+            } else if (isOver) {
+                items.push(dummy);
+            } else {
+                delete this.state.onHoverPos;
+            }
 
             return connectDropTarget(
                 <div className="list">

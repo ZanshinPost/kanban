@@ -49,6 +49,7 @@ h1, h2, h3 {
   outline: none;
   width: 100%;
   border: none;
+  padding: 0 5px;
   transition: all 0.2s ease-in-out;
 }
 
@@ -63,6 +64,13 @@ h1, h2, h3 {
 .list .item {
   padding: 5px;
   background: #fff;  
+  border-radius: 5px;
+}
+
+.item.dummy {
+  height: 2em;
+  border: 1px dotted #333;
+  background: #eee;
 }
 
 .item span {

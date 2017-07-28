@@ -10,6 +10,7 @@ class Board extends Component {
         this.state = {
             lists: lists
         };
+        this.currentOperation = {};
 
         this.addItemListener = this.addItemListener.bind(this);
         this.addListListener = this.addListListener.bind(this);
@@ -24,8 +25,8 @@ class Board extends Component {
     }
 
     updateListAfterDrop(listId, itemIndex, item) {
-        let source = this.state.currentOperation.source;
-        let target = this.state.currentOperation.target;
+        let source = this.currentOperation.source;
+        let target = this.currentOperation.target;
 
         if (!source && !target) {
             this.addItemListener(listId, item);
@@ -42,11 +43,8 @@ class Board extends Component {
     }
 
     itemHoverListener({ source, target }) {
-        this.setState(prevState => {
-            prevState.currentOperation = prevState.currentOperation || {};
-            prevState.currentOperation.source = source;
-            prevState.currentOperation.target = target;
-        });
+        this.currentOperation.source = source;
+        this.currentOperation.target = target;
     }
 
     addItemListener(key, item, targetIndex) {
