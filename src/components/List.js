@@ -10,9 +10,11 @@ const itemTarget = {
         if (monitor.didDrop()) {
             return;
         }
+        let dropPos = monitor.getClientOffset().y;
+        let titleBottomPos = component.title.getBoundingClientRect().bottom;
         let itemObj = monitor.getItem();
         props.removeItemListener(itemObj.listId, itemObj.item);
-        props.addItemListener(props.id, itemObj.item);
+        props.addItemListener(props.id, itemObj.item, undefined, dropPos < titleBottomPos);
     }
 };
 
@@ -96,7 +98,9 @@ class List extends Component {
             return connectDropTarget(
                 <div className="list">
                     <span style={{ float: 'right', cursor: 'pointer', margin: 0 }} onClick={this.removeListListener}>x</span>
-                    <h3>{this.props.title}</h3>
+                    <h3 ref={title => (this.title = title)}>
+                        {this.props.title}
+                    </h3>
                     {items}
                     <input placeholder="Enter new task..."
                         onKeyPress={this.onKeyPressListener} />
