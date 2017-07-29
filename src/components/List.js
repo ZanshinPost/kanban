@@ -3,19 +3,16 @@ import ListItem from './ListItem.js';
 import DummyItem from './DummyItem.js';
 import { ItemTypes } from '../constants.js';
 import { DropTarget } from 'react-dnd';
+import uuid from 'uuid';
 
 const itemTarget = {
     drop(props, monitor, component) {
-        let itemObj = monitor.getItem();
-        props.updateList(props.id, itemObj.index, itemObj.item);
-        component.setState({
-            onHoverPos: undefined
-        });
-    },
-    hover(props, monitor) {
-        if (monitor.isOver({ shallow: true }) !== monitor.isOver()) {
-            console.log('hovering');
+        if (monitor.didDrop()) {
+            return;
         }
+        let itemObj = monitor.getItem();
+        props.removeItemListener(itemObj.listId, itemObj.item);
+        props.addItemListener(props.id, itemObj.item);
     }
 };
 
@@ -30,29 +27,33 @@ class List extends Component {
     constructor(props) {
         super(props);
         this.onKeyPressListener = this.onKeyPressListener.bind(this);
-        this.removeItemListener = this.removeItemListener.bind(this);
         this.removeListListener = this.removeListListener.bind(this);
         this.itemHoverListener = this.itemHoverListener.bind(this);
+        this.itemDropListener = this.itemDropListener.bind(this);
 
         this.state = {};
     }
 
     onKeyPressListener(e) {
         if (e.charCode === 13 && e.target.value.trim().length > 0) {
-            if (this.props.title)
-                this.props.addItemListener(this.props.id, e.target.value);
-            else
+            if (this.props.title) {
+                let item = { key: uuid.v4(), value: e.target.value };
+                this.props.addItemListener(this.props.id, item);
+            }
+            else {
                 this.props.addListListener(e.target.value);
+            }
             e.target.value = '';
         }
     }
 
-    removeItemListener(index) {
-        this.props.removeItemListener(this.props.id, index);
-    }
-
     removeListListener() {
         this.props.removeListListener(this.props.id);
+    }
+
+    itemDropListener(targetId, dragSource) {
+        this.props.removeItemListener(dragSource.listId, dragSource.item);
+        this.props.addItemListener(this.props.id, dragSource.item, targetId);
     }
 
     itemHoverListener({ source, target }) {
@@ -75,10 +76,11 @@ class List extends Component {
         if (this.props.title) {
             const items = this.props.items.map((item, i) => (
                 <ListItem key={i}
-                    index={i}
+                    id={item.key}
                     listId={this.props.id}
-                    item={item}
-                    removeItemListener={this.removeItemListener}
+                    item={item.value}
+                    removeItemListener={this.props.removeItemListener}
+                    itemDropListener={this.itemDropListener}
                     itemHoverListener={this.itemHoverListener} />
             ));
             // const dummy = <DummyItem key="-1" />

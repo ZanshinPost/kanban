@@ -65,6 +65,7 @@ h1, h2, h3 {
   padding: 5px;
   background: #fff;  
   border-radius: 5px;
+  min-height: 1.5em;
 }
 
 .item.dummy {

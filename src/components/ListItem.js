@@ -5,29 +5,34 @@ import { DragSource, DropTarget } from 'react-dnd';
 const listItemSource = {
     beginDrag(props) {
         return {
-            item: props.item,
-            index: props.index,
+            item: { key: props.id, value: props.item },
             listId: props.listId
         };
     }
 };
 
-const itemDropTarget = (function () {
-    let hoverCalled = false;
-    return {
-        hover(props, monitor) {
-            if (!hoverCalled) {
-                props.itemHoverListener({
-                    'target': [props.listId, props.index, props.item],
-                    'source': [monitor.getItem().listId, monitor.getItem().index, monitor.getItem().item]
-                });
-                hoverCalled = true;
-                setTimeout(() => (hoverCalled = false), 250);
-            }
-        }
-    };
+// const itemDropTarget = (function () {
+//     let hoverCalled = false;
+//     return {
+//         hover(props, monitor) {
+//             if (!hoverCalled) {
+//                 props.itemHoverListener({
+//                     'target': [props.listId, props.id, props.item],
+//                     'source': [monitor.getItem().listId, monitor.getItem().id, monitor.getItem().item]
+//                 });
+//                 hoverCalled = true;
+//                 setTimeout(() => (hoverCalled = false), 250);
+//             }
+//         }
+//     };
 
-})();
+// })();
+
+const itemDropTarget = {
+    drop(props, monitor) {
+        props.itemDropListener(props.id, monitor.getItem());
+    }
+};
 
 function dragCollect(connect, monitor) {
     return {
@@ -45,7 +50,7 @@ function dropCollect(connect, monitor) {
 
 class ListItem extends Component {
     onClickListener(e) {
-        this.props.removeItemListener(this.props.index);
+        this.props.removeItemListener(this.props.listId, { key: this.props.id, value: this.props.item });
     }
 
     render() {

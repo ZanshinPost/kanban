@@ -47,13 +47,14 @@ class Board extends Component {
         this.currentOperation.target = target;
     }
 
-    addItemListener(key, item, targetIndex) {
+    addItemListener(listId, itemObj, targetId) {
         this.setState((prevState) => {
-            let list = prevState.lists.filter(list => list.key === key)[0];
-            if (typeof targetIndex !== 'undefined') {
-                list.items.splice(targetIndex, 0, item);
+            let list = prevState.lists.filter(list => list.key === listId)[0];
+            if (typeof targetId !== 'undefined') {
+                let index = list.items.findIndex(item => item.key === targetId);
+                list.items.splice(index, 0, itemObj);
             } else {
-                list.items.push(item);
+                list.items.push(itemObj);
             }
 
             return prevState;
@@ -67,10 +68,10 @@ class Board extends Component {
         });
     }
 
-    removeItemListener(listId, itemIndex) {
+    removeItemListener(listId, { key }) {
         this.setState((prevState) => {
             let list = prevState.lists.filter(list => list.key === listId)[0];
-            list.items.splice(itemIndex, 1);
+            list.items = list.items.filter(item => item.key !== key);
             return prevState;
         });
     }
@@ -87,11 +88,9 @@ class Board extends Component {
                 id={list.key}
                 title={list.title}
                 items={list.items}
-                updateList={this.updateListAfterDrop}
                 addItemListener={this.addItemListener}
                 removeItemListener={this.removeItemListener}
-                removeListListener={this.removeListListener}
-                itemHoverListener={this.itemHoverListener} />
+                removeListListener={this.removeListListener} />
         ));
         Lists.push(<List key={-1} addListListener={this.addListListener} />);
 
