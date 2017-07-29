@@ -67,9 +67,9 @@ class Board extends Component {
         });
     }
 
-    removeItemListener(key, itemIndex) {
+    removeItemListener(listId, itemIndex) {
         this.setState((prevState) => {
-            let list = prevState.lists.filter(list => list.key === key)[0];
+            let list = prevState.lists.filter(list => list.key === listId)[0];
             list.items.splice(itemIndex, 1);
             return prevState;
         });

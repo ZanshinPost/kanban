@@ -11,6 +11,11 @@ const itemTarget = {
         component.setState({
             onHoverPos: undefined
         });
+    },
+    hover(props, monitor) {
+        if (monitor.isOver({ shallow: true }) !== monitor.isOver()) {
+            console.log('hovering');
+        }
     }
 };
 
@@ -57,6 +62,14 @@ class List extends Component {
         this.props.itemHoverListener({ source, target });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        // if (prevState.onHoverPos !== undefined && !prevProps.isOver) {
+        //     this.setState({
+        //         onHoverPos: undefined
+        //     });
+        // }
+    }
+
     render() {
         const { connectDropTarget, isOver } = this.props;
         if (this.props.title) {
@@ -68,15 +81,15 @@ class List extends Component {
                     removeItemListener={this.removeItemListener}
                     itemHoverListener={this.itemHoverListener} />
             ));
-            const dummy = <DummyItem key="-1" />
+            // const dummy = <DummyItem key="-1" />
 
-            if (this.state.onHoverPos !== undefined) {
-                items.splice(this.state.onHoverPos, 0, dummy);
-            } else if (isOver) {
-                items.push(dummy);
-            } else {
-                delete this.state.onHoverPos;
-            }
+            // if (this.state.onHoverPos !== undefined) {
+            //     items.splice(this.state.onHoverPos, 0, dummy);
+            // } else if (isOver) {
+            //     items.push(dummy);
+            // } else {
+            //     delete this.state.onHoverPos;
+            // }
 
             return connectDropTarget(
                 <div className="list">
