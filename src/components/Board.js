@@ -47,18 +47,11 @@ class Board extends Component {
         this.currentOperation.target = target;
     }
 
-    addItemListener(listId, itemObj, targetId, addToStart) {
+    addItemListener(listId, itemToAdd, targetIndex) {
         this.setState((prevState) => {
             let list = prevState.lists.filter(list => list.key === listId)[0];
-            if (typeof targetId !== 'undefined') {
-                let index = list.items.findIndex(item => item.key === targetId);
-                list.items.splice(index, 0, itemObj);
-            } else {
-                if (addToStart)
-                    list.items.unshift(itemObj);
-                else
-                    list.items.push(itemObj);
-            }
+
+            list.items.splice(targetIndex, 0, itemToAdd);
 
             return prevState;
         });

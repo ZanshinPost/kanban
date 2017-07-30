@@ -12,9 +12,10 @@ const itemTarget = {
         }
         let dropPos = monitor.getClientOffset().y;
         let titleBottomPos = component.title.getBoundingClientRect().bottom;
-        let itemObj = monitor.getItem();
-        props.removeItemListener(itemObj.listId, itemObj.item);
-        props.addItemListener(props.id, itemObj.item, undefined, dropPos < titleBottomPos);
+        let targetIndex = dropPos < titleBottomPos ? 0 : props.items.length;
+        let { listId, dragSource } = monitor.getItem();
+        props.removeItemListener(listId, dragSource);
+        props.addItemListener(props.id, dragSource, targetIndex);
     }
 };
 
@@ -40,7 +41,7 @@ class List extends Component {
         if (e.charCode === 13 && e.target.value.trim().length > 0) {
             if (this.props.title) {
                 let item = { key: uuid.v4(), value: e.target.value };
-                this.props.addItemListener(this.props.id, item);
+                this.props.addItemListener(this.props.id, item, this.props.items.length);
             }
             else {
                 this.props.addListListener(e.target.value);
@@ -53,9 +54,10 @@ class List extends Component {
         this.props.removeListListener(this.props.id);
     }
 
-    itemDropListener(targetId, dragSource) {
-        this.props.removeItemListener(dragSource.listId, dragSource.item);
-        this.props.addItemListener(this.props.id, dragSource.item, targetId);
+    itemDropListener(targetId, { listId, dragSource }) {
+        let targetIndex = this.props.items.findIndex(item => item.key === targetId);
+        this.props.removeItemListener(listId, dragSource);
+        this.props.addItemListener(this.props.id, dragSource, targetIndex);
     }
 
     itemHoverListener({ source, target }) {

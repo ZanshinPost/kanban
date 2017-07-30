@@ -5,7 +5,7 @@ import { DragSource, DropTarget } from 'react-dnd';
 const listItemSource = {
     beginDrag(props) {
         return {
-            item: { key: props.id, value: props.item },
+            dragSource: { key: props.id, value: props.item },
             listId: props.listId
         };
     }
@@ -57,9 +57,11 @@ class ListItem extends Component {
         const { connectDragSource, connectDropTarget, isDragging } = this.props;
 
         return connectDropTarget(connectDragSource(
-            <div className="item" style={{ opacity: isDragging ? 0.5 : 1 }}>
-                {this.props.item}
-                <span onClick={this.onClickListener.bind(this)}>x</span>
+            <div className="item_container">
+                <div className="item" style={{ opacity: isDragging ? 0.5 : 1 }}>
+                    {this.props.item}
+                    <span onClick={this.onClickListener.bind(this)}>x</span>
+                </div>
             </div>
         ));
     }

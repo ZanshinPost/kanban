@@ -41,7 +41,7 @@ h1, h2, h3 {
 }
 
 .list > * {
-  margin: 8px 0;
+  padding-bottom: 8px;
 }
 
 .list > input {
