@@ -16,6 +16,11 @@ const itemTarget = {
         let { listId, dragSource } = monitor.getItem();
         props.removeItemListener(listId, dragSource);
         props.addItemListener(props.id, dragSource, targetIndex);
+    },
+    hover(props, monitor) {
+        if (monitor.isOver({ shallow: true })) {
+            console.log(`hover over ${props.id}`);
+        }
     }
 };
 
