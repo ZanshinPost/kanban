@@ -6,16 +6,8 @@ import List from './List.js';
 class Board extends Component {
     constructor(props) {
         super(props);
-        let { lists } = JSON.parse(localStorage.getItem('lists')) || { lists: [] };
-        this.state = {
-            lists: lists
-        };
         this.currentOperation = {};
 
-        this.addItemListener = this.addItemListener.bind(this);
-        this.addListListener = this.addListListener.bind(this);
-        this.removeItemListener = this.removeItemListener.bind(this);
-        this.removeListListener = this.removeListListener.bind(this);
         this.itemHoverListener = this.itemHoverListener.bind(this);
         this.updateListAfterDrop = this.updateListAfterDrop.bind(this);
     }
@@ -47,48 +39,17 @@ class Board extends Component {
         this.currentOperation.target = target;
     }
 
-    addItemListener(listId, itemToAdd, targetIndex) {
-        this.setState((prevState) => {
-            let list = prevState.lists.filter(list => list.key === listId)[0];
-
-            list.items.splice(targetIndex, 0, itemToAdd);
-
-            return prevState;
-        });
-    }
-
-    addListListener(title) {
-        this.setState((prevState) => {
-            prevState.lists.push({ 'title': title, 'key': prevState.lists.length, 'items': [] });
-            return prevState;
-        });
-    }
-
-    removeItemListener(listId, { key }) {
-        this.setState((prevState) => {
-            let list = prevState.lists.filter(list => list.key === listId)[0];
-            list.items = list.items.filter(item => item.key !== key);
-            return prevState;
-        });
-    }
-
-    removeListListener(listId) {
-        this.setState(prevState => ({
-            lists: prevState.lists.filter(list => list.key !== listId)
-        }));
-    }
-
     render() {
-        const Lists = this.state.lists.map(list => (
+        const Lists = this.props.lists.map(list => (
             <List key={list.key}
                 id={list.key}
                 title={list.title}
                 items={list.items}
-                addItemListener={this.addItemListener}
-                removeItemListener={this.removeItemListener}
-                removeListListener={this.removeListListener} />
+                addItemListener={this.props.addItem}
+                removeItemListener={this.props.removeItem}
+                removeListListener={this.props.removeList} />
         ));
-        Lists.push(<List key={-1} addListListener={this.addListListener} />);
+        Lists.push(<List key={-1} addListListener={this.props.addList} />);
 
         return (
             <div className="board">
