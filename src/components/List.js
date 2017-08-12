@@ -5,24 +5,39 @@ import { ItemTypes } from '../constants.js';
 import { DropTarget } from 'react-dnd';
 import uuid from 'uuid';
 
+let hoverCalled = false;
 const itemTarget = {
     drop(props, monitor, component) {
         if (monitor.didDrop()) {
             return;
         }
-        let dropPos = monitor.getClientOffset().y;
-        let titleBottomPos = component.title.getBoundingClientRect().bottom;
-        let targetIndex = dropPos < titleBottomPos ? 0 : props.items.length;
+        let targetIndex = getTargetIndexForDropAndHover(props, monitor, component);
         let { listId, dragSource } = monitor.getItem();
-        props.removeItemListener(listId, dragSource);
-        props.addItemListener(props.id, dragSource, targetIndex);
+        callDropListeners(props, listId, props.id, dragSource, targetIndex);
     },
-    hover(props, monitor) {
-        if (monitor.isOver({ shallow: true })) {
-            console.log(`hover over ${props.id}`);
+    hover(props, monitor, component) {
+        if (!hoverCalled) {
+            if (monitor.isOver({ shallow: true })) {
+                let targetIndex = getTargetIndexForDropAndHover(props, monitor, component);
+                props.showHover(props.id, targetIndex);
+            }
+            hoverCalled = true;
+            setTimeout(() => hoverCalled = false, 250);
         }
     }
 };
+
+function getTargetIndexForDropAndHover(props, monitor, component) {
+    let dropPos = monitor.getClientOffset().y;
+    let titleBottomPos = component.title.getBoundingClientRect().bottom;
+    return dropPos < titleBottomPos ? 0 : props.items.length;
+}
+
+function callDropListeners({ addItemListener, removeItemListener, showHover }, sourcelistId, targetListId, dragSource, targetIndex) {
+    removeItemListener(sourcelistId, dragSource);
+    addItemListener(targetListId, dragSource, targetIndex);
+    showHover(undefined, undefined);
+}
 
 function collect(connect, monitor) {
     return {
@@ -36,6 +51,7 @@ class List extends Component {
         super(props);
         this.onKeyPressListener = this.onKeyPressListener.bind(this);
         this.itemDropListener = this.itemDropListener.bind(this);
+        this.itemHoverListener = this.itemHoverListener.bind(this);
 
         this.state = {};
     }
@@ -55,12 +71,16 @@ class List extends Component {
 
     itemDropListener(targetId, { listId, dragSource }) {
         let targetIndex = this.props.items.findIndex(item => item.key === targetId);
-        this.props.removeItemListener(listId, dragSource);
-        this.props.addItemListener(this.props.id, dragSource, targetIndex);
+        callDropListeners(this.props, listId, this.props.id, dragSource, targetIndex);
+    }
+
+    itemHoverListener(targetId) {
+        let targetIndex = this.props.items.findIndex(item => item.key === targetId);
+        this.props.showHover(this.props.id, targetIndex);
     }
 
     render() {
-        const { connectDropTarget, isOver } = this.props;
+        const { connectDropTarget, hoverPos } = this.props;
         if (this.props.title) {
             const items = this.props.items.map((item, i) => (
                 <ListItem key={i}
@@ -68,18 +88,14 @@ class List extends Component {
                     listId={this.props.id}
                     item={item.value}
                     removeItemListener={this.props.removeItemListener}
-                    itemDropListener={this.itemDropListener} />
+                    itemDropListener={this.itemDropListener}
+                    itemHoverListener={this.itemHoverListener} />
             ));
-            // const dummy = <DummyItem key="-1" />
-
-            // if (this.state.onHoverPos !== undefined) {
-            //     items.splice(this.state.onHoverPos, 0, dummy);
-            // } else if (isOver) {
-            //     items.push(dummy);
-            // } else {
-            //     delete this.state.onHoverPos;
-            // }
-
+            if (hoverPos && hoverPos.listId === this.props.id) {
+                const dummy = <DummyItem key="-1" />
+                console.log(hoverPos.index);
+                items.splice(hoverPos.index, 0, dummy);
+            }
             return connectDropTarget(
                 <div className="list">
                     <span style={{ float: 'right', cursor: 'pointer', margin: 0 }}

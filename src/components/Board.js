@@ -9,9 +9,11 @@ function Board(props) {
             id={list.key}
             title={list.title}
             items={list.items}
+            hoverPos={props.hoverPos}
             addItemListener={props.addItem}
             removeItemListener={props.removeItem}
-            removeListListener={props.removeList} />
+            removeListListener={props.removeList}
+            showHover={props.showHover} />
     ));
     Lists.push(<List key={-1} addListListener={props.addList} />);
 

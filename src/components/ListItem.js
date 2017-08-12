@@ -2,6 +2,8 @@ import React from 'react';
 import { ItemTypes } from '../constants.js';
 import { DragSource, DropTarget } from 'react-dnd';
 
+let hoverCalled = false;
+
 const listItemSource = {
     beginDrag(props) {
         return {
@@ -11,22 +13,18 @@ const listItemSource = {
     }
 };
 
-const itemDropTarget = (function () {
-    let hoverCalled = false;
-    return {
-        hover(props, monitor) {
-            if (!hoverCalled) {
-                console.log(`hover on ${props.item} of ${props.listId}`);
-                hoverCalled = true;
-                setTimeout(() => (hoverCalled = false), 250);
-            }
-        },
-        drop(props, monitor) {
-            props.itemDropListener(props.id, monitor.getItem());
+const itemDropTarget = {
+    hover(props, monitor) {
+        if (!hoverCalled) {
+            console.log(`hover on ${props.item} of ${props.listId}`);
+            props.itemHoverListener(props.id);
+            setTimeout(() => (hoverCalled = false), 250);
         }
-    };
-
-})();
+    },
+    drop(props, monitor) {
+        props.itemDropListener(props.id, monitor.getItem());
+    }
+};
 
 function dragCollect(connect, monitor) {
     return {
@@ -49,7 +47,7 @@ function ListItem({ connectDragSource, connectDropTarget, isDragging, ...props }
                 {props.item}
                 <span onClick={() => props.removeItemListener(props.listId, { key: props.id, value: props.item })}>
                     x
-                    </span>
+                </span>
             </div>
         </div>
     ));

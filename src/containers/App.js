@@ -13,10 +13,12 @@ class App extends Component {
             <div className="App">
                 <Header />
                 <Board lists={this.props.lists}
+                    hoverPos={this.props.hoverPos}
                     addList={this.props.actions.addList}
                     addItem={this.props.actions.addItem}
                     removeItem={this.props.actions.removeItem}
-                    removeList={this.props.actions.removeList} />
+                    removeList={this.props.actions.removeList}
+                    showHover={this.props.actions.showHover} />
             </div>
         );
     }
@@ -24,7 +26,8 @@ class App extends Component {
 
 function mapStateToProps(state) {
     return {
-        lists: state.lists
+        lists: state.lists,
+        hoverPos: state.hoverPos
     }
 }
 
